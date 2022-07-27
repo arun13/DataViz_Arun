@@ -95,16 +95,6 @@
             var new_cases = svg.selectAll(".line")
                 .data(sumstat)
                 .enter();
-/*//tooltip
-            var tooltip = svg.select("body")
-                .data(sumstat)
-                .append("div")
-                .style("position", "absolute")
-                .style("z-index", "10")
-                .style("visibility", "hidden")
-                .text(function(d) {
-                    console.log("Counry: ",d.key);
-                    return d.key; });*/
 
                 new_cases.append("path")
                 .attr("fill", "none")

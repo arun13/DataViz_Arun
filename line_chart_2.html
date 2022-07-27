@@ -13,7 +13,7 @@
 
     var parseTime = d3.timeParse("%m/%d/%Y");
     // set the dimensions and margins of the graph
-    var margin = {top: 10, right: 30, bottom: 30, left: 60},
+    var margin = {top: 10, right: 60, bottom: 30, left: 60},
         width = 700 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
@@ -62,10 +62,11 @@
                 .range(d3['schemeCategory10'])
 
             // Draw the line
-            svg.selectAll(".line")
+            var new_cases = svg.selectAll(".line")
                 .data(sumstat)
-                .enter()
-                .append("path")
+                .enter();
+
+                new_cases.append("path")
                 .attr("fill", "none")
                 .attr("stroke", function(d){ return color(d.key) })
                 .attr("stroke-width", 1.5)
@@ -74,10 +75,15 @@
                         .x(function(d) { return x(d.date); })
                         .y(function(d) { return y(+d.new_cases_per_million); })
                         (d.values)
-                })
-                .append("text")
-                .attr("x", 3)
-                .attr("dy", "0.35em")
+                });
+
+                new_cases.append("text")
+                .datum((function(d) {
+                    console.log(d);
+                    return {key: d.key, value: d.values[d.values.length - 1]}; }))
+                .attr("transform",  function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.new_cases_per_million) + ")"; })
+                .attr("dy", ".35em")
+                .attr("text-anchor", "start")
                 .style("font", "10px sans-serif")
                 .text(function(d) {
                     console.log(d.key);

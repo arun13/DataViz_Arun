@@ -93,20 +93,18 @@
                 updateGraph(selectValue);
             };
 
-          // add the squares
-            svg.selectAll()
-                .data(data, function(d) {return d.group+':'+d.variable;})
 
             // Draw the line
-            var initialGraph = function(country) {
+       //     var initialGraph = function(country) {
                 // Filter the data to include only fruit of interest
                 var selectCountry = sumstat.filter(function(d){
-                    return d.key == country;
+                    return d.key == "India";
                 })
                 var new_cases = svg.selectAll(".line")
                     .data(selectCountry)
                     .enter();
-                new_cases.append("path")
+
+                     new_cases.append("path")
                     .attr("fill", "none")
                     .attr("stroke", function (d) {
                         return color(d.key)
@@ -142,31 +140,37 @@
                 new_cases
                     .append("g")
                     .call(makeAnnotations);
-            }
+          //  }
 
             var updateGraph = function(country) {
                 // Filter the data to include only fruit of interest
                 var selectCountry = sumstat.filter(function(d){
+                    console.log(country);
                     return d.key == country;
                 })
-                var new_cases = svg.selectAll("path.line")
+
+               console.log(selectCountry);
+
+                svg.selectAll("path.line")
                     .data(selectCountry)
                     .transition()
                     .duration(1000)
                     .attr("fill", "none")
                     .attr("stroke", function (d) {
+                            console.log(d.key);
                         return color(d.key)})
                     .attr("stroke-width", 1.5)
                     .attr("d", function (d) {
-                        return d3.line()
-                            .x(function (d) {
-                                return x(d.date);
-                            })
-                            .y(function (d) {
-                                return y(+d.new_deaths);
-                            })
-                            (d.values)
-                    });
+                       console.log(d.key);
+                       return d3.line()
+                           .x(function (d) {
+                               return x(d.date);
+                           })
+                           .y(function (d) {
+                               return y(+d.new_deaths);
+                           })
+                           (d.values)
+                   })
                 // Features of the annotation
                 const annotations = [
                     {
@@ -182,14 +186,14 @@
                     }
                 ]
                 // Add annotation to the chart
-      /*          const makeAnnotations = d3.annotation()
-                    .annotations(annotations)
-                new_cases
+                const makeAnnotations = d3.annotation()
+                    .annotations(annotations);
+             /*   new_cases
                     .append("g")
                     .call(makeAnnotations);*/
             }
 
-            initialGraph("India");
+     //       initialGraph("India");
 
             })
 </script>

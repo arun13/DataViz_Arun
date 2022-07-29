@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
-    <link rel="stylesheet" href="style/main.css">
+  <link rel="stylesheet" href="style/main.css">
 </head>
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
@@ -33,36 +33,36 @@
   //Read the data
   d3.csv("data/owid-covid-data_test.csv", function(data) {
 
-      // Added dropdown
-      var sumstat = d3.nest() // nest function allows to group the calculation per level of a factor
-          .key(function(d) { return d.location;})
-          .entries(data);
+    // Added dropdown
+    var sumstat = d3.nest() // nest function allows to group the calculation per level of a factor
+            .key(function(d) { return d.location;})
+            .entries(data);
 
-      var select = d3.select('#country_selection')
-          .append('select')
-          // .attr('class','select')
-          .attr('class','box')
-          .on('change',onchange)
+    var select = d3.select('#country_selection')
+            .append('select')
+            // .attr('class','select')
+            .attr('class','box')
+            .on('change',onchange)
 
-      var options = select
-          .selectAll('option')
-          .data(sumstat).enter()
-          .append('option')
-          .attr("selected", function(d){
+    var options = select
+            .selectAll('option')
+            .data(sumstat).enter()
+            .append('option')
+            .attr("selected", function(d){
               return d === "India"
-          })
-          .text(function (d) { return d.key; });
+            })
+            .text(function (d) { return d.key; });
 
-      function onchange() {
-          selectValue = d3.select('select').property('value')
-          d3.select('body')
+    function onchange() {
+      selectValue = d3.select('select').property('value')
+      d3.select('body')
               .append('p')
               .text(selectValue + ' is the last selected option.')
 
-          updateChart(selectValue);
-      };
+      updateChart(selectValue);
+    };
 
-      var data = data.filter(function(d){
+    var data = data.filter(function(d){
       return d.location == "Germany";
     });
 
@@ -143,14 +143,14 @@
             .attr("y", function(d) { return y(d.value); })
             .attr("height", function(d) { return height - y(d.value); });
 
-  function updateChart(country){
+    function updateChart(country){
       var max = formatted_data.reduce(function(prev, current) {
-          return (prev.value > current.value) ? prev : current
+        return (prev.value > current.value) ? prev : current
       })
       console.log(max);
       var colors = d3.scaleLinear()
-          .domain([0, max.value * .33, max.value * .66, max.value])
-          .range(['#3FC974', '#f1d229', '#da682b', '#ee232c']);
+              .domain([0, max.value * .33, max.value * .66, max.value])
+              .range(['#3FC974', '#f1d229', '#da682b', '#ee232c']);
 
       x.domain(formatted_data.map(function(d) { return d.date; }));
       y.domain([0, d3.max(formatted_data, function(d) { return d.value; })]);
@@ -158,29 +158,29 @@
 
 
       svg.append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + height + ")")
-          .call(xAxis.ticks(null).tickSize(0))
-          .selectAll("text")
-          .style("text-anchor", "middle")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + height + ")")
+              .call(xAxis.ticks(null).tickSize(0))
+              .selectAll("text")
+              .style("text-anchor", "middle")
 
       svg.append("g")
-          .attr("class", "y axis")
-          .call(yAxis.ticks(null).tickSize(0))
-          .append("text")
-          .attr("y", 6)
-          .style("text-anchor", "middle");
+              .attr("class", "y axis")
+              .call(yAxis.ticks(null).tickSize(0))
+              .append("text")
+              .attr("y", 6)
+              .style("text-anchor", "middle");
 
       svg.selectAll("rect")
-          .data(dataset)
-          .transition() // <---- Here is the transition
-          .duration(2000) // 2 seconds
-          .style("fill", function(d){ return colors(d.value)})
-          .attr("x", function(d) { return x(d.date); })
-          .attr("width", x.bandwidth())
-          .attr("y", function(d) { return y(d.value); })
-          .attr("height", function(d) { return height - y(d.value); });
-          }
+              .data(dataset)
+              .transition() // <---- Here is the transition
+              .duration(2000) // 2 seconds
+              .style("fill", function(d){ return colors(d.value)})
+              .attr("x", function(d) { return x(d.date); })
+              .attr("width", x.bandwidth())
+              .attr("y", function(d) { return y(d.value); })
+              .attr("height", function(d) { return height - y(d.value); });
+    }
   });
 
 </script>

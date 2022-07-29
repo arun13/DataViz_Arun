@@ -95,7 +95,7 @@
             .range([height, 0]);
 
     var xAxis = d3.axisBottom(x)
-               .scale(x)
+            .scale(x)
     //.tickFormat(d3.timeFormat("%b%y"));
     //.tickFormat(d3.timeFormat("%b%y"));
 
@@ -118,19 +118,19 @@
           var yAxis = svg.append("g")
               .call(d3.axisLeft(y));
     */
-  /*    var colors = d3.scaleLinear()
-          .domain([0, d3.sum(formatted_data, function(d) { return +d.value; })])
-          .range(['#3FC974', '#f1d229', '#da682b', '#ee232c'])*/
+    /*    var colors = d3.scaleLinear()
+            .domain([0, d3.sum(formatted_data, function(d) { return +d.value; })])
+            .range(['#3FC974', '#f1d229', '#da682b', '#ee232c'])*/
 
- //   var max =120000;
+    //   var max =120000;
 
-      var max = formatted_data.reduce(function(prev, current) {
-          return (prev.value > current.value) ? prev : current
-      })
+    var max = formatted_data.reduce(function(prev, current) {
+      return (prev.value > current.value) ? prev : current
+    })
     console.log(max);
     var colors = d3.scaleLinear()
-                 .domain([0, max.value * .33, max.value * .66, max.value])
-                 .range(['#3FC974', '#f1d229', '#da682b', '#ee232c']);
+            .domain([0, max.value * .33, max.value * .66, max.value])
+            .range(['#3FC974', '#f1d229', '#da682b', '#ee232c']);
 
     x.domain(formatted_data.map(function(d) { return d.date; }));
     y.domain([0, d3.max(formatted_data, function(d) { return d.value; })]);

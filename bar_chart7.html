@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-
+<head>
+    <link rel="stylesheet" href="style/main.css">
+</head>
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
 
 <!-- Load d3-annotation -->
 <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.js"></script>
-
+<div id="country_selection"></div>
 <div id="scene_two"></div>
 
 <script>
@@ -32,7 +34,38 @@
   //Read the data
   d3.csv("data/owid-covid-data_test.csv", function(data) {
 
-    var data = data.filter(function(d){
+      // Added dropdown
+      var sumstat = d3.nest() // nest function allows to group the calculation per level of a factor
+          .key(function(d) { return d.location;})
+          .entries(data);
+
+      var select = d3.select('#country_selection')
+          .append('select')
+          // .attr('class','select')
+          .attr('class','box')
+          .on('change',onchange)
+
+      var options = select
+          .selectAll('option')
+          .data(sumstat).enter()
+          .append('option')
+          .attr("selected", function(d){
+              return d === "India"
+          })
+          .text(function (d) { return d.key; });
+
+      function onchange() {
+          selectValue = d3.select('select').property('value')
+          d3.select('body')
+              .append('p')
+              .text(selectValue + ' is the last selected option.')
+
+          updateGraph(selectValue);
+      };
+//
+
+
+      var data = data.filter(function(d){
       return d.location == "Germany";
     });
 

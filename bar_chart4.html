@@ -11,45 +11,73 @@
 
 <script>
 
-  var margin = {top: 20, right: 20, bottom: 70, left: 40},
-          width = 1200 - margin.left - margin.right,
-          height = 400 - margin.top - margin.bottom;
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   // Parse the date / time
-  var	parseDate = d3.timeParse("%m/%d/%Y");
+  var parseDate = d3.timeParse("%m/%d/%Y");
 
+  var margin = {top: 10, right: 60, bottom: 30, left: 60},
+      width = 54000 - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom;
 
-  d3.csv("data/owid-covid-data_test.csv", function(error, data) {
+  var svg = d3.select("#scene_two")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform","translate(" + margin.left + "," + margin.top + ")");
 
-    var x = d3.scaleBand()
-            .domain(d3.extent(data, function(d) {
+  const formatMonthYear = d3.timeFormat("%b%y");
+  //Read the data
+  d3.csv("data/owid-covid-data_test.csv", function(data) {
+
+      data.forEach(function(d) {
+          d.date = parseDate(d.date);
+          d.value = +d.new_deaths;
+      });
+          var x = d3.scaleBand()
+                    .domain(d3.extent(data, function(d) {
+                     return d.date }))
+                    .rangeRound([0, width], .05).padding(0.1);
+
+            var y = d3.scaleLinear()
+                    .domain([0, d3.sum(data, function(d) { return +d.new_deaths; })])
+                     // .domain([0, d3.max(data, function(d) { return +d.new_deaths; })])
+                    .range([height, 0]);
+
+            var xAxis = d3.axisBottom(x)
+                       .scale(x)
+                .tickFormat(d3.timeFormat("%b%y"));
+                       //.tickFormat(d3.timeFormat("%b%y"));
+
+            var yAxis = d3.axisLeft()
+                        .scale(y)
+                        .ticks(20);
+/*
+      var x = d3.scaleTime()
+          .domain(d3.extent(data, function(d) {
               return d.date }))
-            .rangeRound([0, width], .05).padding(0.1);
+          .range([ 0, width ]);
+      var xAxis = svg.append("g")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%b%y")).ticks(17));
 
-    var y = d3.scaleLinear()
-            .domain([0, d3.max(data, function(d) { return +d.new_deaths; })])
-            .range([height, 0]);
-
-    var xAxis = d3.axisBottom()
-            .scale(x)
-            .tickFormat(d3.timeFormat("%b"));
-
-    var yAxis = d3.axisLeft()
-            .scale(y)
-            .ticks(20);
-
-    var svg = d3.select("#scene_two").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform",
-                    "translate(" + margin.left + "," + margin.top + ")");
+      // Add Y axis
+      var y = d3.scaleLinear()
+          .domain([0, d3.max(data, function(d) { return +d.new_cases_per_million; })])
+          .range([ height, 0 ]);
+      var yAxis = svg.append("g")
+          .call(d3.axisLeft(y));
+*/
 
 
-    data.forEach(function(d) {
-      d.date = parseDate(d.date);
-      d.value = +d.new_deaths;
+
+    console.log(data);
+    var data = data.filter(function(d){
+      return d.location == "Germany";
     });
+    console.log(data);
 
     x.domain(data.map(function(d) { return d.date; }));
     y.domain([0, d3.max(data, function(d) { return d.value; })]);
@@ -71,13 +99,13 @@
             //       .attr("transform", "rotate(-90)")
             .attr("y", 6)
             //       .attr("dy", ".71em")
-            .style("text-anchor", "middle")
-            .text("Value");
+            .style("text-anchor", "middle");
+           // .text("Value");
 
     svg.selectAll("bar")
             .data(data)
             .enter().append("rect")
-            .style("fill", function(d){ return d.value < d.target ? '#EF5F67': '#3FC974'})
+            .style("fill", function(d){ return d.value > 500 ? '#EF5F67': '#3FC974'})
             .attr("x", function(d) { return x(d.date); })
             .attr("width", x.bandwidth())
             .attr("y", function(d) { return y(d.value); })
@@ -97,5 +125,3 @@
   });
 
 </script>
-
-</body>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<!-- Load d3-annotation -->
+<script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.js"></script>
+
+<div id="scene_two"></div>
+
+<script>
+
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  // Parse the date / time
+  var parseDate = d3.timeParse("%m/%d/%Y");
+
+  var margin = {top: 10, right: 60, bottom: 30, left: 60},
+          width = 54000 - margin.left - margin.right,
+          height = 500 - margin.top - margin.bottom;
+
+  var svg = d3.select("#scene_two")
+          .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+
+  const formatMonthYear = d3.timeFormat("%b%y");
+  //Read the data
+  d3.csv("data/owid-covid-data_test.csv", function(data) {
+
+    data.forEach(function(d) {
+      d.date = formatMonthYear(parseDate(d.date));
+      //    console.log(d.date);
+      d.value = d.new_deaths;
+      //     console.log("Date ",d.date," DD ",d.value);
+    });
+    //   console.log(data);
+    var sumdata = d3.nest()
+            .key(function(d) { return d.date;})
+            .entries(data);
+
+    console.log(sumdata);
+    var x = d3.scaleBand()
+            .domain(d3.extent(sumdata, function(d) {
+              return d.key }))
+            .rangeRound([0, width], .05).padding(0.1);
+
+    var y = d3.scaleLinear()
+            .domain([0, d3.sum(sumdata, function(d) { return +d.new_deaths; })])
+            // .domain([0, d3.max(data, function(d) { return +d.new_deaths; })])
+            .range([height, 0]);
+
+    var xAxis = d3.axisBottom(x)
+            .scale(x)
+            .tickFormat(d3.timeFormat("%b%y"));
+    //.tickFormat(d3.timeFormat("%b%y"));
+
+    var yAxis = d3.axisLeft()
+            .scale(y)
+            .ticks(20);
+    /*
+          var x = d3.scaleTime()
+              .domain(d3.extent(data, function(d) {
+                  return d.date }))
+              .range([ 0, width ]);
+          var xAxis = svg.append("g")
+              .attr("transform", "translate(0," + height + ")")
+              .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%b%y")).ticks(17));
+
+          // Add Y axis
+          var y = d3.scaleLinear()
+              .domain([0, d3.max(data, function(d) { return +d.new_cases_per_million; })])
+              .range([ height, 0 ]);
+          var yAxis = svg.append("g")
+              .call(d3.axisLeft(y));
+    */
+
+
+
+    console.log(data);
+    var data = data.filter(function(d){
+      return d.location == "Germany";
+    });
+    console.log(data);
+
+    x.domain(data.map(function(d) { return d.date; }));
+    y.domain([0, d3.max(data, function(d) { return d.value; })]);
+
+    svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis.ticks(null).tickSize(0))
+            .selectAll("text")
+            .style("text-anchor", "middle")
+//       .attr("dx", "-.8em")
+//       .attr("dy", "-.55em")
+//       .attr("transform", "rotate(-90)" );
+
+    svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis.ticks(null).tickSize(0))
+            .append("text")
+            //       .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            //       .attr("dy", ".71em")
+            .style("text-anchor", "middle");
+    // .text("Value");
+
+    svg.selectAll("bar")
+            .data(data)
+            .enter().append("rect")
+            .style("fill", function(d){ return d.value > 500 ? '#EF5F67': '#3FC974'})
+            .attr("x", function(d) { return x(d.date); })
+            .attr("width", x.bandwidth())
+            .attr("y", function(d) { return y(d.value); })
+            .attr("height", function(d) { return height - y(d.value); });
+    /* svg.selectAll("lines")
+             .data(data)
+             .enter().append("line")
+             .style("fill", 'none')
+             .attr("x1", function(d) { return x(d.date) + x.bandwidth()+5; })
+             .attr("x2", function(d) { return x(d.date)-5; })
+             .attr("y1", function(d) { return y(d.target); })
+             .attr("y2", function(d) { return y(d.target); })
+             .style("stroke-dasharray", [2,2])
+             .style("stroke", "#000000")
+             .style("stroke-width", 2)*/
+
+  });
+
+</script>
